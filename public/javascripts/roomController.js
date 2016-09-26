@@ -27,10 +27,6 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
     });
 
     socket.on("userLeft", function (data) {
-        angular.forEach($scope.allUsers, function (user, idx) {
-            $scope.discIdx = user.name == data.left ? idx : '';
-        });
-        console.log($scope.discIdx);
         if (data.left) {
             toastr.warning(data.left + " has left.");
         }
@@ -39,7 +35,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
                 scope.allUsers = data.allUsers;
             }, 1000);
         });
-        console.log(data);
+      //   console.log(data);
     });
 
     socket.on("addExistingContent", function (data) {

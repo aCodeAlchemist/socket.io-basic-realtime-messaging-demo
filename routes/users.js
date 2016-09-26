@@ -10,8 +10,9 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/createRoom', function (req, res, next) {
-  console.log("room");
-  var id =  mongoose.Types.ObjectId; 
+
+  var id =  mongoose.Types.ObjectId(); 
+    console.log("room : ", id);
   var u = new db.Room({
     _id:id,
     name: req.query.name

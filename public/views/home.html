@@ -1,10 +1,10 @@
 <div class="container">
     <div class="row">
-        <form action="" method="POST" role="form" ng-submit="createRoom()">
-            <legend>Form title</legend>
+        <form method="GET" role="form" ng-submit="createRoom()">
+            <legend>Skillvo</legend>
             <div class="form-group">
                 <label for="r">Room</label>
-                <input type="text" class="form-control" id="r" placeholder="room name" ng-model="roomname">
+                <input type="text" class="form-control" id="r" placeholder="room name" ng-model="roomname"  autofocus autocomplete="off">
             </div>
             <button class="btn btn-primary" type="submit"> Create Room</button>
         </form>

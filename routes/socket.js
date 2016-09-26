@@ -2,11 +2,16 @@ module.exports = function(app, io) {
     var users = [],
         existingContent;
     io.on('connection', function(socket) {
+
         console.log("user connected...");
+
         socket.on("addUser", function(data) {
             users.push(data);
             socket.name = data.name;
-            io.emit('userAdded', { joined: data.name, allUsers: users });
+            socket.roomId = data.roomId;
+            socket.join(data.roomId);
+            // io.emit('userAdded', { joined: data.name, allUsers: users });
+            io.to(socket.roomId).emit('userAdded', { joined: data.name, allUsers: users });
         });
 
         // socket.emit("addExistingContent", { data: existingContent, allUsers: users });
@@ -25,5 +30,6 @@ module.exports = function(app, io) {
             console.log(users);
             socket.broadcast.emit('userLeft', { left: socket.name, allUsers: users });
         });
+
     });
 };
