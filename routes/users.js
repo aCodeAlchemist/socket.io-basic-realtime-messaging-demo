@@ -19,7 +19,7 @@ router.get('/createRoom', function (req, res, next) {
   });
 
   u.save(function (err) {
-    res.send({id: id});
+    res.send({id: id, name : req.query.name});
   });
 
 });
@@ -29,6 +29,8 @@ router.get('/rooms', function (req, res, next) {
     res.send(records);
   });
 });
+
+
 
 
 module.exports = router;

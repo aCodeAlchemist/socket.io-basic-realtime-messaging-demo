@@ -1,34 +1,46 @@
-module.exports = function(app, io) {
+var db = require("../database/database.js");
+
+module.exports = function (app, io) {
     var users = [],
-        existingContent;
-    io.on('connection', function(socket) {
+        existingContent, rooms = {};
+    io.on('connection', function (socket) {
+
 
         console.log("user connected...");
 
-        socket.on("addUser", function(data) {
-            users.push(data);
+        socket.on("addUser", function (data) {
+
             socket.name = data.name;
             socket.roomId = data.roomId;
             socket.join(data.roomId);
+
+            rooms[socket.roomId] = rooms[socket.roomId] || [];
+            rooms[socket.roomId].push(data);
+
             // io.emit('userAdded', { joined: data.name, allUsers: users });
-            io.to(socket.roomId).emit('userAdded', { joined: data.name, allUsers: users });
+            io.to(socket.roomId).emit('userAdded', { joined: data.name, allUsers: rooms[socket.roomId] });
         });
 
         // socket.emit("addExistingContent", { data: existingContent, allUsers: users });
 
-        socket.on("addedMessage", function(data) {
+        socket.on("addedMessage", function (data) {
             data.sent = false;
-            socket.broadcast.emit('changedValue', data);
+            socket.broadcast.to(socket.roomId).emit('changedValue', data);
         });
 
-        socket.on('disconnect', function() {
-            for (var i = 0; i < users.length; i++) {
-                if (users[i].name == socket.name) {
-                    users.splice(i, 1);
+        socket.on('disconnect', function () {
+            if (rooms[socket.roomId] && rooms[socket.roomId].length) {
+
+                for (var i = 0; i < rooms[socket.roomId].length; i++) {
+                    if (rooms[socket.roomId][i].name == socket.name) {
+                        rooms[socket.roomId].splice(i, 1);
+                    }
                 }
+                console.log(users);
+                socket.broadcast.to(socket.roomId).emit('userLeft', { left: socket.name, allUsers: rooms[socket.roomId] });
+            }else{
+                db.Room.remove({_id:  socket.roomId});
             }
-            console.log(users);
-            socket.broadcast.emit('userLeft', { left: socket.name, allUsers: users });
         });
 
     });

@@ -12,7 +12,7 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
         templateUrl: 'views/home.html',
         controller: 'homeController'
     }).state('room', {
-        url: '/room/:roomId',
+        url: '/room/:roomId/:name',
         templateUrl: 'views/room.html',
         controller: 'roomController'
     });
@@ -20,7 +20,7 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
     $urlRouterProvider.otherwise('/');
 }]);
 
-app.controller('homeController', ['$scope', '$sce', '$timeout', 'toastr', '$http', '$state',function ($scope, $sce, $timeout, toastr, $http, $state) {
+app.controller('homeController', ['$scope', '$sce', '$timeout', 'toastr', '$http', '$state', function ($scope, $sce, $timeout, toastr, $http, $state) {
     // var socket = io.connect("http://10.10.5.149:3000");
     // var socket = io.connect("http://messaging.labs.webmpires.net");
     var socket = io.connect("http://10.10.6.110:3000");
@@ -28,11 +28,20 @@ app.controller('homeController', ['$scope', '$sce', '$timeout', 'toastr', '$http
 
     $scope.createRoom = function () {
         if ($scope.roomname) {
-            var data = {name : $scope.roomname};
-            $http.get("/users/createRoom", {params :data}).then(function(res){
-                $state.go("room", {"roomId": res.data.id});
+            var data = { name: $scope.roomname };
+            $http.get("/users/createRoom", { params: data }).then(function (res) {
+                $state.go("room", { "roomId": res.data.id, "name": res.data.name });
                 console.log(res.data);
             });
         }
     };
+
+    $scope.getRooms = function () {
+        $http.get("/users/rooms").then(function (res) {
+            $scope.roomList = res.data;
+            console.log(res.data);
+        });
+    };
+    
+    $scope.getRooms();
 }]);

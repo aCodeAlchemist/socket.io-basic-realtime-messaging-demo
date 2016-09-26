@@ -1,6 +1,7 @@
 app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stateParams', function ($scope, $sce, $timeout, toastr, $stateParams) {
 
     var roomId = $stateParams.roomId;
+    $scope.roomName = $stateParams.name;
 
     // var socket = io.connect("http://10.10.5.149:3000");
     //  var socket = io.connect("http://messaging.labs.webmpires.net");
