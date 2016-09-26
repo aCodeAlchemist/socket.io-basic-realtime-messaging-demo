@@ -3,7 +3,7 @@
  *
  * Description
  */
-var app = angular.module('ngEditor', ['textAngular', 'ngSanitize', 'toastr']);
+var app = angular.module('messaging', ['ngSanitize', 'toastr']);
 
 app.controller('textEditorCtrl', ['$scope', '$sce', '$timeout', 'toastr', function($scope, $sce, $timeout, toastr) {
     // var socket = io.connect("http://10.10.5.149:3000");
