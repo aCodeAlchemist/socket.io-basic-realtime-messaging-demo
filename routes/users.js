@@ -24,5 +24,11 @@ router.get('/createRoom', function (req, res, next) {
 
 });
 
+router.get('/rooms', function (req, res, next) {
+  db.Room.find({}, function (err, records) {
+    res.send(records);
+  });
+});
+
 
 module.exports = router;
