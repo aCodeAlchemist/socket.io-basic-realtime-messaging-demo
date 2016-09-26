@@ -64,6 +64,22 @@
             </ul>
         </div>
     </div>
+    <div class="row">
+        <div class="container">
+            
+            <form action="" method="POST" role="form" ng-submit="createRoom()">
+                <legend>Form title</legend>
+            
+                <div class="form-group">
+                    <label for="r">Room</label>
+                    <input type="text" class="form-control" id="r" placeholder="room name" ng-model="roomname">
+                </div>
+            
+                <button class="btn btn-primary" type="submit"> Create Room</button>
+            </form>
+            
+        </div>
+    </div>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" crossorigin="anonymous"></script>
@@ -71,6 +87,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular-sanitize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/1.7.0/angular-toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/1.7.0/angular-toastr.tpls.min.js"></script>
+    <script src="javascripts/main.js"></script>
 </body>
 
 </html>
