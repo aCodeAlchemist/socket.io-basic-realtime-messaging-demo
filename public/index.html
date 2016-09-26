@@ -13,73 +13,9 @@
     
 </head>
 
-<body ng-controller="textEditorCtrl">
+<body>
 
-    <div class="clearfix">
-        <div class="col-md-9" ng-show="isUserAdded">
-            <div class="page-header">
-                <h2>Basic Messaging</h2>
-            </div>
-            <!-- Chat box -->
-            <div class="row">
-                <div class="col-md-12">
-                    <form name="chatForm" ng-submit="send()">
-                        <div class="form-group col-md-10">
-                            <input type="text" class="form-control" ng-model="data.message" placeholder="Type your message here...">
-                        </div>
-                        <div class="form-group col-md-2">
-                            <button class="btn btn-success btn-block"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="row messagesBox">
-                <div class="col-md-7 col-sm-7 col-xs-7" ng-repeat="m in messages" ng-class="{'pull-right': m.sent, 'pull-left': !m.sent}">
-                    <div class="alert" ng-class="{'alert-info': m.sent, 'alert-warning': !m.sent}">
-                        <h4>{{m.user}}</h4>{{m.text}}</div>
-                </div>
-            </div>
-            <!--<h2>Type here to broadcast:</h2>
-            <p></p>
-            <div text-angular ng-model="htmlVariable" ng-change="change(htmlVariable)"></div>
-            <hr>
-            <p><strong>Output: </strong></p>
-            <div ng-bind-html="htmlVariable"></div>-->
-        </div>
-        <div class="col-md-3 side-bar">
-            <h1>{{userName}}</h1>
-            <form method="POST" role="form" ng-submit="addMe()" ng-hide="isUserAdded">
-                <!-- <legend>Current Users</legend> -->
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" placeholder="Type your name to begin" ng-model="userName">
-                </div>
-            </form>
-            <h4>Online Users</h4>
-            <hr>
-            <ul class="list-group">
-                <li class="list-group-item" ng-repeat="user in allUsers">
-                    <i class="fa fa-circle green" ng-class="{'red': discIdx == $index, 'blue': userName === user.name}"> </i> &nbsp; {{user.name}}
-                </li>
-            </ul>
-        </div>
-    </div>
-    <div class="row">
-        <div class="container">
-            
-            <form action="" method="POST" role="form" ng-submit="createRoom()">
-                <legend>Form title</legend>
-            
-                <div class="form-group">
-                    <label for="r">Room</label>
-                    <input type="text" class="form-control" id="r" placeholder="room name" ng-model="roomname">
-                </div>
-            
-                <button class="btn btn-primary" type="submit"> Create Room</button>
-            </form>
-            
-        </div>
-    </div>
+    <ui-view></ui-view>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" crossorigin="anonymous"></script>
@@ -87,7 +23,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular-sanitize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/1.7.0/angular-toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-toastr/1.7.0/angular-toastr.tpls.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
     <script src="javascripts/main.js"></script>
+    <script src="javascripts/roomController.js"></script>
 </body>
 
 </html>

@@ -3,9 +3,24 @@
  *
  * Description
  */
-var app = angular.module('messaging', ['ngSanitize', 'toastr']);
+var app = angular.module('messaging', ['ngSanitize', 'toastr', 'ui.router']);
 
-app.controller('textEditorCtrl', ['$scope', '$sce', '$timeout', 'toastr', '$http', function ($scope, $sce, $timeout, toastr, $http) {
+app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $urlRouterProvider) {
+
+    $stateProvider.state('home', {
+        url: '/',
+        templateUrl: 'views/home.html',
+        controller: 'HomeController'
+    }).state('room', {
+        url: '/room/:roomId',
+        templateUrl: 'views/room.html',
+        controller: 'RoomController'
+    });
+
+    $urlRouterProvider.otherwise('/');
+}]);
+
+app.controller('homeController', ['$scope', '$sce', '$timeout', 'toastr', '$http', function ($scope, $sce, $timeout, toastr, $http) {
     // var socket = io.connect("http://10.10.5.149:3000");
     // var socket = io.connect("http://messaging.labs.webmpires.net");
     var socket = io.connect("http://10.10.6.110:3000");
