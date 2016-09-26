@@ -1,6 +1,5 @@
-var db = require("../database/database.js");
-
 module.exports = function (app, io) {
+    var db = require("../database/database.js");
     var users = [],
         existingContent, rooms = {};
     io.on('connection', function (socket) {
@@ -29,19 +28,27 @@ module.exports = function (app, io) {
         });
 
         socket.on('disconnect', function () {
-            if (rooms[socket.roomId] && rooms[socket.roomId].length) {
+            if(socket.roomId) {
+                console.log("USERS IN ROOM >>>> ", rooms[socket.roomId]);
+                if (rooms[socket.roomId] && rooms[socket.roomId].length) {
 
-                for (var i = 0; i < rooms[socket.roomId].length; i++) {
-                    if (rooms[socket.roomId][i].name == socket.name) {
-                        rooms[socket.roomId].splice(i, 1);
+                    for (var i = 0; i < rooms[socket.roomId].length; i++) {
+                        if (rooms[socket.roomId][i].name == socket.name) {
+                            rooms[socket.roomId].splice(i, 1);
+                        }
+                    }
+                    if(rooms[socket.roomId].length === 0) {
+                        console.log("ROOM ID >>>> ", socket.roomId);
+                        db.Room.remove({_id:  socket.roomId}, function (err, res) {
+                            console.log(res);
+                        });
+                        delete rooms[socket.roomId];
+                        io.emit("deletedRoom", {id: socket.roomId});
+                    } else {
+                        socket.broadcast.to(socket.roomId).emit('userLeft', { left: socket.name, allUsers: rooms[socket.roomId] });
                     }
                 }
-                console.log(users);
-                socket.broadcast.to(socket.roomId).emit('userLeft', { left: socket.name, allUsers: rooms[socket.roomId] });
-            }else{
-                db.Room.remove({_id:  socket.roomId});
             }
         });
-
     });
 };

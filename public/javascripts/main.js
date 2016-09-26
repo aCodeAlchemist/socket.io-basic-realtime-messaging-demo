@@ -23,8 +23,14 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
 app.controller('homeController', ['$scope', '$sce', '$timeout', 'toastr', '$http', '$state', function ($scope, $sce, $timeout, toastr, $http, $state) {
     // var socket = io.connect("http://10.10.5.149:3000");
     // var socket = io.connect("http://messaging.labs.webmpires.net");
-    var socket = io.connect("http://10.10.6.110:3000");
+    var socket = io.connect("http://10.10.6.123:3000");
     var audio = new Audio('sounds/alert.mp3');
+
+    socket.on("deletedRoom", function (data) {
+        $scope.$evalAsync(function (scope) {
+            $scope.getRooms();
+        });
+    });
 
     $scope.createRoom = function () {
         if ($scope.roomname) {

@@ -5,7 +5,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
 
     // var socket = io.connect("http://10.10.5.149:3000");
     //  var socket = io.connect("http://messaging.labs.webmpires.net");
-    var socket = io.connect("http://10.10.6.110:3000");
+    var socket = io.connect("http://10.10.6.123:3000");
     var audio = new Audio('sounds/alert.mp3');
 
     $scope.messages = [];
