@@ -1,5 +1,6 @@
 module.exports = function (app, io) {
     var db = require("../database/database.js");
+    var user = require("./usersHelper.js");
     var users = [],
         existingContent, rooms = {};
     io.on('connection', function (socket) {
@@ -9,15 +10,19 @@ module.exports = function (app, io) {
 
         socket.on("addUser", function (data) {
 
-            socket.name = data.name;
-            socket.roomId = data.roomId;
-            socket.join(data.roomId);
-
-            rooms[socket.roomId] = rooms[socket.roomId] || [];
-            rooms[socket.roomId].push(data);
-
-            // io.emit('userAdded', { joined: data.name, allUsers: users });
-            io.to(socket.roomId).emit('userAdded', { joined: data.name, allUsers: rooms[socket.roomId] });
+            user.setUserOnline(data.id, function () {
+                socket.name = data.name;
+                socket.userId = data.id;
+                socket.roomId = data.roomId;
+                socket.join(data.roomId);
+                rooms[socket.roomId] = rooms[socket.roomId] || [];
+                rooms[socket.roomId].push(data);
+                console.log("adding...", data.id);
+                
+                console.log("broadcasting...");
+                // io.emit('userAdded', { joined: data.name, allUsers: users });
+                io.to(socket.roomId).emit('userAdded', { joined: data.name, allUsers: rooms[socket.roomId] });
+            });
         });
 
         // socket.emit("addExistingContent", { data: existingContent, allUsers: users });
@@ -28,26 +33,28 @@ module.exports = function (app, io) {
         });
 
         socket.on('disconnect', function () {
-            if(socket.roomId) {
-                console.log("USERS IN ROOM >>>> ", rooms[socket.roomId]);
-                if (rooms[socket.roomId] && rooms[socket.roomId].length) {
+            console.log('SETTING OFFLINE >>>>> ', socket.userId);
+            if(socket.roomId && socket.userId) {
+                user.setUserOffine(socket.userId, function () {
+                    if (rooms[socket.roomId] && rooms[socket.roomId].length) {
 
-                    for (var i = 0; i < rooms[socket.roomId].length; i++) {
-                        if (rooms[socket.roomId][i].name == socket.name) {
-                            rooms[socket.roomId].splice(i, 1);
+                        for (var i = 0; i < rooms[socket.roomId].length; i++) {
+                            if (rooms[socket.roomId][i].name == socket.name) {
+                                
+                                rooms[socket.roomId].splice(i, 1);
+                            }
+                        }
+                        if(rooms[socket.roomId].length === 0) {
+                            db.Room.remove({_id:  socket.roomId}, function (err, res) {
+                                console.log(res);
+                            });
+                            delete rooms[socket.roomId];
+                            io.emit("deletedRoom", {id: socket.roomId});
+                        } else {
+                            socket.broadcast.to(socket.roomId).emit('userLeft', { left: socket.name, allUsers: rooms[socket.roomId] });
                         }
                     }
-                    if(rooms[socket.roomId].length === 0) {
-                        console.log("ROOM ID >>>> ", socket.roomId);
-                        db.Room.remove({_id:  socket.roomId}, function (err, res) {
-                            console.log(res);
-                        });
-                        delete rooms[socket.roomId];
-                        io.emit("deletedRoom", {id: socket.roomId});
-                    } else {
-                        socket.broadcast.to(socket.roomId).emit('userLeft', { left: socket.name, allUsers: rooms[socket.roomId] });
-                    }
-                }
+                });
             }
         });
     });

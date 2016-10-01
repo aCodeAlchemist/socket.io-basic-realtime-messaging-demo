@@ -1,4 +1,4 @@
-app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stateParams', function ($scope, $sce, $timeout, toastr, $stateParams) {
+app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stateParams', 'Factory', 'Upload', function ($scope, $sce, $timeout, toastr, $stateParams, Factory, Upload) {
 
     var roomId = $stateParams.roomId;
     $scope.roomName = $stateParams.name;
@@ -10,6 +10,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
 
     $scope.messages = [];
     $scope.data = [];
+    $scope.formData = {};
 
     socket.on("changedValue", function (data) {
         $scope.$evalAsync(function (scope) {
@@ -20,7 +21,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
 
     socket.on("userAdded", function (data) {
         $scope.$evalAsync(function (scope) {
-            if (data.joined !== $scope.userName) {
+            if (data.joined !== $scope.formData.userName) {
                 toastr.success(data.joined + " has joined.");
             }
             scope.allUsers = data.allUsers;
@@ -46,21 +47,48 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
     });
 
     $scope.addMe = function () {
-        if (!$scope.userName) {
+        if (!$scope.formData.userName || !$scope.formData.email) {
             return;
         }
-        socket.emit("addUser", {
-            name: $scope.userName,
-            roomId: roomId
+        
+        Factory.addUser($scope.formData).then(function (response) {
+            socket.emit("addUser", {
+                name: $scope.formData.userName,
+                id: response.data.id,
+                roomId: roomId
+            });
+            $scope.isUserAdded = true;
+        }, function () {
+            alert("Error when adding user.");
         });
-        $scope.isUserAdded = true;
+        
+    };
+
+    $scope.upload = function (file, type) {
+        if(file) {
+            Upload.upload({
+                url: '/users/media',
+                data: { file: file }
+            }).then(function(resp) {
+                console.log(resp);
+                $scope.messages.unshift({ text: resp.data.url, sent: true, user: $scope.formData.userName, type: type});
+                socket.emit("addedMessage", {
+                    type: type,
+                    text: resp.data.url,
+                    user: $scope.formData.userName
+                });
+            }, function(resp) {
+                alert("Error when uploading image.");  
+            });
+        }
     };
 
     $scope.send = function (text) {
-        $scope.messages.unshift({ text: $scope.data.message, sent: true, user: $scope.userName });
+        $scope.messages.unshift({ text: $scope.data.message, sent: true, user: $scope.formData.userName, type: "text" });
         socket.emit("addedMessage", {
+            type: "text",
             text: $scope.data.message,
-            user: $scope.userName
+            user: $scope.formData.userName
         });
         $scope.data.message = '';
     }

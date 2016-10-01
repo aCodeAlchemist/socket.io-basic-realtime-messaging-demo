@@ -3,9 +3,9 @@
  *
  * Description
  */
-var app = angular.module('messaging', ['ngSanitize', 'toastr', 'ui.router']);
+var app = angular.module('messaging', ['ngSanitize', 'toastr', 'ui.router', 'ngFileUpload']);
 
-app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $urlRouterProvider) {
+app.config(["$stateProvider", "$urlRouterProvider", '$sceProvider', function ($stateProvider, $urlRouterProvider, $sceProvider) {
 
     $stateProvider.state('home', {
         url: '/',
@@ -18,6 +18,8 @@ app.config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $u
     });
 
     $urlRouterProvider.otherwise('/');
+
+    $sceProvider.enabled(false);
 }]);
 
 app.controller('homeController', ['$scope', '$sce', '$timeout', 'toastr', '$http', '$state', function ($scope, $sce, $timeout, toastr, $http, $state) {
@@ -34,8 +36,7 @@ app.controller('homeController', ['$scope', '$sce', '$timeout', 'toastr', '$http
 
     $scope.createRoom = function () {
         if ($scope.roomname) {
-            var data = { name: $scope.roomname };
-            $http.get("/users/createRoom", { params: data }).then(function (res) {
+            $http.post("/users/createRoom", { name: $scope.roomname }).then(function (res) {
                 $state.go("room", { "roomId": res.data.id, "name": res.data.name });
                 console.log(res.data);
             });

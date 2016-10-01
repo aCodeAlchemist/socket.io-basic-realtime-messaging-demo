@@ -15,87 +15,16 @@ mongoose.connection.once('open', function () {
 
 var db = {};
 
-db.Community = mongoose.model('Community', {
-	name: String,
-	shortName: String,
-	shortId: {
-		type: String,
-		default: shortid.generate
-	},
-	description: String,
-	admins: Array,
-	createdAt: Date
-});
-
-db.User = mongoose.model('User', {
-	userId: Number,
-	fname: String,
-	lname: String,
+db.User = mongoose.model('RoomUsers', {
 	useranme: String,
-	email: {
-		type: String,
-		unique: true,
-	},
-	password: String,
-	phones: Array,
-	relationShip: {
-		type: String,
-		enum: ['single', 'married', 'engaged', 'divorced', 'widow']
-	},
-	gender: {
-		type: String,
-		enum: ['male', 'female']
-	},
-	dob: { type: Date, default: null },
-	addresses: Array,
-	pictureUrl: String,
-	familyTree: {
-		type: Object // grandparent, parent, sibling, spouse, children, grandchildren
-	},
-	utype: { type: Number, default: 1 },
-	token: {
-		type: String,
-		unique: true,
-		'default': shortid.generate
-	},
-	qualifications: Array,
-	invited: { type: Date, default: null },
-	joined: { type: Date, default: null },
-	subscriptions: Object,
-	jobSeeker: { type: Boolean, default: true },
-	isAdmin: { type: Boolean, default: true },
-	communities: Array,
-	communityId: Schema.Types.ObjectId,
-	isVerified: { type: Boolean, default: false },
-	isActive: { type: Boolean, default: false },
-	isOnline: { type: Boolean, default: false },
-	lastPasswordChanged: { type: Boolean, default: false },
-	createdAt: { type: Date },
-	serverCreatedAt: { type: Date, default: Date.now }
-});
-
-db.SuperAdmin = mongoose.model('Superadmin', {
-	fname: String,
-	lname: String,
-	username: String,
-	password: String,
 	email: String,
-	createdAt: Date
-});
-
-
-db.Jobs = mongoose.model('Jobs', {
-	postedBy: String,
-	company: String,
-	experience: Number,
-	addresses: Array,
-	postedTime: { type: Date, default: Date.now },
-	fresher: { type: Boolean, default: false },
-	role: String,
-	description: String,
-	salary: String,
-	industries: Array,
-	keySkills: [String]
+	status: {
+		type: String,
+        enum: ['online', 'offline', 'idle']
+	},
+	createdAt: { type: Date, default: Date.now },
+	userAgent: String,
+	ip: String
 });
 
 db.Room = mongoose.model('Room', {
