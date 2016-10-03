@@ -9,7 +9,7 @@
                 <div class="col-md-12">
                     <form name="chatForm" ng-submit="send()">
                         <div class="form-group col-md-8">
-                            <input type="text" class="form-control" ng-model="data.message" placeholder="Type your message here...">
+                            <input type="text" class="form-control" ng-model="data.message" placeholder="Type your message here..." ng-keyup="onKeyUp()">
                         </div>
                         <div class="form-group col-md-4">
                             <a class="btn btn-default" ngf-select="upload($file, 'image')" ngf-pattern="'image/*'" ngf-accept="'image/*'" ngf-multiple="false" ngf-validate-force="true" name='file'>
@@ -27,6 +27,9 @@
                 </div>
             </div>
             <div class="row messagesBox">
+                <div class="col-md-7 col-sm-7 col-xs-7" ng-if="rc.usersTyping.length > 0">
+                    {{rc.whoIsTyping}} {{rc.usersTyping.length > 1 ? 'are' : 'is'}} typing...
+                </div>
                 <div class="col-md-7 col-sm-7 col-xs-7" ng-repeat="m in messages" ng-class="{'pull-right': m.sent, 'pull-left': !m.sent}">
                     <div class="alert" ng-class="{'alert-info': m.sent, 'alert-warning': !m.sent}">
                         <h4>{{m.user}}</h4>

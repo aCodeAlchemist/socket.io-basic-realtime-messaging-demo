@@ -32,6 +32,14 @@ module.exports = function (app, io) {
             socket.broadcast.to(socket.roomId).emit('changedValue', data);
         });
 
+        socket.on("typing", function (data) {
+            socket.broadcast.to(socket.roomId).emit('startedTyping', data);
+        });
+
+        socket.on("typingStopped", function (data) {
+            socket.broadcast.to(socket.roomId).emit('stoppedTyping', data);
+        });
+
         socket.on('disconnect', function () {
             console.log('SETTING OFFLINE >>>>> ', socket.userId);
             if(socket.roomId && socket.userId) {
