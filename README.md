@@ -95,7 +95,7 @@ Requires following data to be sent in event:
 
 Triggered when new user is added in room. Following data will be available in callback:
 ```json
-{ "joined": "user name who joined", allUsers: ["Array of all users"] }
+{ "joined": "user name who joined", "allUsers": ["Array of all users"] }
 ```
 
 ### `onMessageRecieved`
@@ -110,5 +110,5 @@ Triggered when someone in the room starts typing or stops typinh. Same data will
 
 Triggered when some user leaves the room. Following data will be available in callback:
 ```json
-{ "left": "user name who left", allUsers: ["Array of all users"] }
+{ "left": "user name who left", "allUsers": ["Array of all users"] }
 ```
