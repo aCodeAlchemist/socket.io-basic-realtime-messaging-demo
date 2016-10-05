@@ -17,19 +17,13 @@ module.exports = function (app, io) {
                 socket.join(data.roomId);
                 rooms[socket.roomId] = rooms[socket.roomId] || [];
                 rooms[socket.roomId].push(data);
-                console.log("adding...", data.id);
-                
-                console.log("broadcasting...");
-                // io.emit('userAdded', { joined: data.name, allUsers: users });
                 io.to(socket.roomId).emit('userAdded', { joined: data.name, allUsers: rooms[socket.roomId] });
             });
         });
 
-        // socket.emit("addExistingContent", { data: existingContent, allUsers: users });
-
         socket.on("addedMessage", function (data) {
             data.sent = false;
-            socket.broadcast.to(socket.roomId).emit('changedValue', data);
+            socket.broadcast.to(socket.roomId).emit('onMessageRecieved', data);
         });
 
         socket.on("typing", function (data) {
@@ -41,24 +35,23 @@ module.exports = function (app, io) {
         });
 
         socket.on('disconnect', function () {
-            console.log('SETTING OFFLINE >>>>> ', socket.userId);
             if(socket.roomId && socket.userId) {
-                user.setUserOffine(socket.userId, function () {
+                user.setUserOffine(socket.userId, function () { // set user status as offline in database when disconnected
                     if (rooms[socket.roomId] && rooms[socket.roomId].length) {
 
                         for (var i = 0; i < rooms[socket.roomId].length; i++) {
                             if (rooms[socket.roomId][i].name == socket.name) {
-                                
-                                rooms[socket.roomId].splice(i, 1);
+                                rooms[socket.roomId].splice(i, 1); // remove user from room
                             }
                         }
+                        // delete room when all users are left
                         if(rooms[socket.roomId].length === 0) {
                             db.Room.remove({_id:  socket.roomId}, function (err, res) {
-                                console.log(res);
+                                delete rooms[socket.roomId];
+                                io.emit("deletedRoom", {id: socket.roomId});
                             });
-                            delete rooms[socket.roomId];
-                            io.emit("deletedRoom", {id: socket.roomId});
                         } else {
+                            // broadcast when user is left
                             socket.broadcast.to(socket.roomId).emit('userLeft', { left: socket.name, allUsers: rooms[socket.roomId] });
                         }
                     }

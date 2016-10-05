@@ -3,9 +3,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
     var roomId = $stateParams.roomId;
     $scope.roomName = $stateParams.name;
 
-    // var socket = io.connect("http://10.10.5.149:3000");
-    //  var socket = io.connect("http://messaging.labs.webmpires.net");
-    var socket = io.connect("http://10.10.6.123:3000");
+    $scope.socket = io.connect("http://messaging.labs.webmpires.net"); // init socket
     var audio = new Audio('sounds/alert.mp3');
 
     $scope.messages = [];
@@ -15,55 +13,44 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
     $scope.typingTimerLength = 5000;
     $scope.rc = {usersTyping: []};
 
-    socket.on("changedValue", function(data) {
-        $scope.$evalAsync(function(scope) {
-            audio.play();
-            scope.messages.unshift(data);
-        });
+    /** Operations performed when message is received */
+    $scope.socket.on("onMessageRecieved", function(data) {
+        audio.play();
+        $scope.messages.unshift(data);
     });
 
-    socket.on("userAdded", function(data) {
-        $scope.$evalAsync(function(scope) {
-            if (data.joined !== $scope.formData.userName) {
-                toastr.success(data.joined + " has joined.");
-            }
-            scope.allUsers = data.allUsers;
-        });
+    /** Operations performed when new user is added into room */
+    $scope.socket.on("userAdded", function(data) {
+        if (data.joined !== $scope.formData.userName) {
+            toastr.success(data.joined + " has joined.");
+        }
+        $scope.allUsers = data.allUsers;
     });
 
-    socket.on("startedTyping", function (data) {
-        $scope.$evalAsync(function(scope) {
-            $scope.rc.usersTyping.push(data.name);
-            $scope.rc.whoIsTyping = $scope.rc.usersTyping.join(', ');
-        });
+    /** Operations to perform when someone starts typing */
+    $scope.socket.on("startedTyping", function (data) {
+        $scope.rc.usersTyping.push(data.name);
+        $scope.rc.whoIsTyping = $scope.rc.usersTyping.join(', ');
     });
 
-    socket.on("stoppedTyping", function (data) {
-        $scope.$evalAsync(function(scope) {
-            var idx = $scope.rc.usersTyping.indexOf(data.name);
-            $scope.rc.usersTyping.splice(idx, 1);
-            $scope.rc.whoIsTyping = $scope.rc.usersTyping.join(', ');
-        });
+    /** Operations to perform when someone stops typing */
+    $scope.socket.on("stoppedTyping", function (data) {
+        var idx = $scope.rc.usersTyping.indexOf(data.name);
+        $scope.rc.usersTyping.splice(idx, 1);
+        $scope.rc.whoIsTyping = $scope.rc.usersTyping.join(', ');
     });
 
-    socket.on("userLeft", function(data) {
+    /** Operations to perform when a user is left from room */
+    $scope.socket.on("userLeft", function(data) {
         if (data.left) {
             toastr.warning(data.left + " has left.");
         }
-        $scope.$evalAsync(function(scope) {
-            $timeout(function() {
-                scope.allUsers = data.allUsers;
-            }, 1000);
-        });
-        //   console.log(data);
+        $timeout(function() {
+            $scope.allUsers = data.allUsers;
+        }, 1000);
     });
 
-    socket.on("addExistingContent", function(data) {
-        $scope.$evalAsync(function(scope) {
-            scope.allUsers = data.allUsers;
-        });
-    });
-
+    /** Broadcast typing / stopped typing when user starts/stops typing */
     $scope.onKeyUp = function() {
         if (!$scope.flags.typing) {
             $scope.flags.typing = true;
@@ -86,6 +73,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
         }, $scope.typingTimerLength);
     };
 
+    /** Add user to the room */
     $scope.addMe = function() {
         if (!$scope.formData.userName || !$scope.formData.email) {
             return;
@@ -105,6 +93,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
 
     };
 
+    /** Upload file */
     $scope.upload = function(file, type) {
         if (file) {
             Upload.upload({
@@ -124,6 +113,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
         }
     };
 
+    /** Send message */
     $scope.send = function(text) {
         $scope.messages.unshift({ text: $scope.data.message, sent: true, user: $scope.formData.userName, type: "text" });
         socket.emit("addedMessage", {

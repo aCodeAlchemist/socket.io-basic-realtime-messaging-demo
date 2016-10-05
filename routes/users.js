@@ -34,15 +34,10 @@ var upload = multer({
     storage: storage
 });
 
-
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-	res.send('respond with a resource');
-});
-
+/** Create new room */
 router.post('/createRoom', function(req, res, next) {
 
-	var id = mongoose.Types.ObjectId();
+	var id = mongoose.Types.ObjectId(); // create Object id
 	
 	var u = new db.Room({
 		_id: id,
@@ -50,22 +45,25 @@ router.post('/createRoom', function(req, res, next) {
 	});
 
 	u.save(function(err) {
-		res.send({ id: id, name: req.body.name });
+		res.send({ id: id, name: req.body.name }); // send created id and name of the room in response
 	});
 
 });
 
+/** Show all rooms created */
 router.get('/rooms', function(req, res, next) {
 	db.Room.find({}, function(err, records) {
 		res.send(records);
 	});
 });
 
+/** Add new user */
 router.post('/add', function(req, res, next) {
 	var id, ip, u;
 
 	id = mongoose.Types.ObjectId();
 
+	// capture client ip
 	if (req.headers['x-forwarded-for']) {
 		ip = req.headers['x-forwarded-for'];
 	} else {
@@ -82,14 +80,7 @@ router.post('/add', function(req, res, next) {
 	});
 
 	u.save(function(err) {
-		res.send({ id: id, name: req.body.name });
-	});
-
-});
-
-router.get('/rooms', function(req, res, next) {
-	db.Room.find({}, function(err, records) {
-		res.send(records);
+		res.send({ id: id, name: req.body.name }); // send user id and name
 	});
 });
 
@@ -98,15 +89,10 @@ router.post('/media', upload.single('file'), function (req, res, next) {
 
 	if(fileName){
 		var imageStorageBase = "http://" + req.headers.host + "/images/users/";
-		res.send({url: imageStorageBase + fileName});
+		res.send({url: imageStorageBase + fileName}); // send file url in response
 	} else {
 		res.status(500).send("Error when uploading file.");
 	}
 });
-
-router.get('/host', function (req, res, next) {
-	res.send({host: req.headers.host});
-});
-
 
 module.exports = router;

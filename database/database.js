@@ -1,8 +1,6 @@
-
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 mongoose.connect("mongodb://localhost:27017/dbname");
-var shortid = require('shortid');
 
 // Log error if not connected
 mongoose.connection.on('error', console.error.bind(console, 'Connection error.'));
@@ -15,6 +13,7 @@ mongoose.connection.once('open', function () {
 
 var db = {};
 
+/*  Room users model*/
 db.User = mongoose.model('RoomUsers', {
 	useranme: String,
 	email: String,
@@ -27,6 +26,7 @@ db.User = mongoose.model('RoomUsers', {
 	ip: String
 });
 
+/** Room model */
 db.Room = mongoose.model('Room', {
 	name: String
 });
