@@ -13,10 +13,12 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
     $scope.typingTimerLength = 5000;
     $scope.rc = {usersTyping: []};
 
+    console.log(moment());
+
     /** Operations performed when message is received */
     $scope.socket.on("onMessageRecieved", function(data) {
         audio.play();
-        $scope.messages.unshift(data);
+        $scope.messages.push(data);
     });
 
     /** Operations performed when new user is added into room */
@@ -54,7 +56,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
     $scope.onKeyUp = function() {
         if (!$scope.flags.typing) {
             $scope.flags.typing = true;
-            socket.emit('typing', {
+            $scope.socket.emit('typing', {
                 name: $scope.formData.userName
             });
         }
@@ -65,7 +67,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
             var typingTimer = (new Date()).getTime();
             var timeDiff = typingTimer - $scope.flags.lastTypingTime;
             if (timeDiff >= $scope.typingTimerLength && $scope.flags.typing) {
-                socket.emit('typingStopped', {
+                $scope.socket.emit('typingStopped', {
                     name: $scope.formData.userName
                 });
                 $scope.flags.typing = false;
@@ -81,7 +83,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
 
         Factory.addUser($scope.formData).then(function(response) {
             $scope.formData.userId = response.data.id;
-            socket.emit("addUser", {
+            $scope.socket.emit("addUser", {
                 name: $scope.formData.userName,
                 id: response.data.id,
                 roomId: roomId
@@ -101,7 +103,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
                 data: { file: file }
             }).then(function(resp) {
                 console.log(resp);
-                $scope.messages.unshift({ text: resp.data.url, sent: true, user: $scope.formData.userName, type: type });
+                $scope.messages.push({ text: resp.data.url, sent: true, user: $scope.formData.userName, type: type, uuid: new moment.now(), date: moment().toDate() });
                 socket.emit("addedMessage", {
                     type: type,
                     text: resp.data.url,
@@ -115,12 +117,20 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
 
     /** Send message */
     $scope.send = function(text) {
-        $scope.messages.unshift({ text: $scope.data.message, sent: true, user: $scope.formData.userName, type: "text" });
-        socket.emit("addedMessage", {
+        $scope.messages.push({ text: $scope.data.message, sent: true, user: $scope.formData.userName, type: "text", uuid: new moment.now(), date: moment().toDate() });
+        $scope.socket.emit("addedMessage", {
             type: "text",
             text: $scope.data.message,
             user: $scope.formData.userName
         });
         $scope.data.message = '';
-    }
+        $("#messageBox").focus();
+    };
+
+    /** load previous messgae */
+
+    $scope.loadPrevious = function(){
+            console.log("loading previous");
+    };
+
 }]);
