@@ -1,5 +1,9 @@
 # Basic Realtime Messaging App Using Socket.io
 
+Leave your queries in gitter chat room.
+[![Join the chat at https://gitter.im/socket-io-basic-realtime-messaging-demo/Lobby](https://badges.gitter.im/socket-io-basic-realtime-messaging-demo/Lobby.svg)](https://gitter.im/socket-io-basic-realtime-messaging-demo/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+
 ## Demo includes following features:
 
 - Creating room
@@ -108,6 +112,3 @@ Triggered when some user leaves the room. Following data will be available in ca
 ```json
 { "left": "user name who left", allUsers: ["Array of all users"] }
 ```
-
-[![Join the chat at https://gitter.im/socket-io-basic-realtime-messaging-demo/Lobby](https://badges.gitter.im/socket-io-basic-realtime-messaging-demo/Lobby.svg)](https://gitter.im/socket-io-basic-realtime-messaging-demo/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-Basic demo for real time messaging using socket.io
