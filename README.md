@@ -6,10 +6,8 @@ Leave your queries in gitter chat room.
 
 ## Demo includes following features:
 
-- Creating room
-- Adding Users
-- Basic messaging
-- Sending Image, Audio, Video files
+- Group/Room based messaging
+- Image, Audio, Video files attachments
 
 ## Setting Up
 
