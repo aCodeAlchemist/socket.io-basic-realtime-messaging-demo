@@ -10,46 +10,56 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
     $scope.data = [];
     $scope.formData = {};
     $scope.flags = {};
-    $scope.typingTimerLength = 5000;
+    $scope.typingTimerLength = 700;
     $scope.rc = {usersTyping: []};
 
     console.log(moment());
 
     /** Operations performed when message is received */
     $scope.socket.on("onMessageRecieved", function(data) {
-        audio.play();
-        $scope.messages.push(data);
+        $scope.$evalAsync(function (scope) {
+            audio.play();
+            scope.messages.push(data);
+        });
     });
 
     /** Operations performed when new user is added into room */
     $scope.socket.on("userAdded", function(data) {
-        if (data.joined !== $scope.formData.userName) {
-            toastr.success(data.joined + " has joined.");
-        }
-        $scope.allUsers = data.allUsers;
+        $scope.$evalAsync(function (scope) {
+            if (data.joined !== $scope.formData.userName) {
+                toastr.success(data.joined + " has joined.");
+            }
+            scope.allUsers = data.allUsers;
+        });
     });
 
     /** Operations to perform when someone starts typing */
     $scope.socket.on("startedTyping", function (data) {
-        $scope.rc.usersTyping.push(data.name);
-        $scope.rc.whoIsTyping = $scope.rc.usersTyping.join(', ');
+        $scope.$evalAsync(function (scope) {
+            scope.rc.usersTyping.push(data.name);
+            scope.rc.whoIsTyping = scope.rc.usersTyping.join(', ');
+        });
     });
 
     /** Operations to perform when someone stops typing */
     $scope.socket.on("stoppedTyping", function (data) {
-        var idx = $scope.rc.usersTyping.indexOf(data.name);
-        $scope.rc.usersTyping.splice(idx, 1);
-        $scope.rc.whoIsTyping = $scope.rc.usersTyping.join(', ');
+        $scope.$evalAsync(function (scope) {
+            var idx = scope.rc.usersTyping.indexOf(data.name);
+            scope.rc.usersTyping.splice(idx, 1);
+            scope.rc.whoIsTyping = scope.rc.usersTyping.join(', ');
+        });
     });
 
     /** Operations to perform when a user is left from room */
     $scope.socket.on("userLeft", function(data) {
-        if (data.left) {
-            toastr.warning(data.left + " has left.");
-        }
-        $timeout(function() {
-            $scope.allUsers = data.allUsers;
-        }, 1000);
+        $scope.$evalAsync(function (scope) {
+            if (data.left) {
+                toastr.warning(data.left + " has left.");
+            }
+            $timeout(function() {
+                scope.allUsers = data.allUsers;
+            }, 1000);
+        });
     });
 
     /** Broadcast typing / stopped typing when user starts/stops typing */
@@ -104,7 +114,7 @@ app.controller('roomController', ['$scope', '$sce', '$timeout', 'toastr', '$stat
             }).then(function(resp) {
                 console.log(resp);
                 $scope.messages.push({ text: resp.data.url, sent: true, user: $scope.formData.userName, type: type, uuid: new moment.now(), date: moment().toDate() });
-                socket.emit("addedMessage", {
+                $socket.emit("addedMessage", {
                     type: type,
                     text: resp.data.url,
                     user: $scope.formData.userName
